@@ -28,6 +28,7 @@ def scrape_all():
     	"news_paragraph": news_paragraph,
     	"featured_image": featured_image(browser),
     	"facts": mars_facts(),
+		"enhanced_images": enhanced_imgs(browser),
     	"last_modified": dt.datetime.now()
 }
 	return data
@@ -161,6 +162,43 @@ def mars_facts():
 #mars_news(browser)
 
 # In[ ]:
+
+def enhanced_imgs(browser):
+	#Visit URL
+	url = 'https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars'
+	browser.visit(url)
+
+	
+	#Initialize list that contains one dictionary for each hemisphere.
+	try:
+		img_urls=[]
+
+		img_links = browser.find_by_css('h3')
+		for link in range(len(img_links)):
+			hemisphere = {}
+    
+    		#Find and click h3 to get redirected to Hemisphere Enhanced
+			browser.find_by_css('h3')[link].click()
+    
+			#On next page, find "Sample" href
+			 
+			sample = browser.links.find_by_text("Sample").first
+			hemisphere["img_url"] = sample["href"]
+    
+    		# Get title of enhanced image
+			hemisphere["title"] = browser.find_by_css("h2.title").text
+    
+    		# Append to list
+			img_urls.append(hemisphere)
+
+			browser.back()
+
+	except AttributeError:
+		return None
+
+	return img_urls
+
+
 
 if __name__ == "__main__":
     # If running as script, print scraped data
